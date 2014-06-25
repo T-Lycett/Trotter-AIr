@@ -3,7 +3,7 @@ import("util.superlib", "SuperLib", 19);
 require("AirportManager.nut");
 require("StationStats.nut");
 Tile <- SuperLib.Tile //temp fix for bug in SuperLib
-
+COMPANYID <- 0;
 
 class Trotter_AIr extends AIController 
 {
@@ -15,6 +15,7 @@ class Trotter_AIr extends AIController
 	helper = null;
 	airportLib = null;
 	PAXID = 0;
+	
 	constructor() {
 	
 	this.spiralWalker = _MinchinWeb_SW_();
@@ -58,6 +59,8 @@ function SetBasicInfo() {
 		iii++;
 	}
 	while (!AICompany.SetName(name + iii))
+	
+	COMPANYID = AICompany.ResolveCompanyID(AICompany.COMPANY_SELF);
 	
 	//choose home town and build hq there.
 	homeTown = AITownList();
