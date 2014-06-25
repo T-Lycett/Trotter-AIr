@@ -2,6 +2,7 @@ import("util.MinchinWeb", "MetaLib", 4);
 import("util.superlib", "SuperLib", 19);
 require("AirportManager.nut");
 require("StationStats.nut");
+require("TownManager");
 Tile <- SuperLib.Tile //temp fix for bug in SuperLib
 COMPANYID <- 0;
 
