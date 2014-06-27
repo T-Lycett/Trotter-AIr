@@ -4,10 +4,13 @@ class AirportManager {
 	maxFlightDistance = 0;
 	minFlightDistance = 0;
 	minPopulationForAirport = 0;
+	
 	airportLib = null;
 	helper = null;
 	spiralWalker = null;
 	stationStats = null;
+	townManager = null;
+	
 	PAXID = 0;
 	townToConnect = null;
 	aircraftToUse = 0;
@@ -23,10 +26,13 @@ class AirportManager {
 		maxFlightDistance = 200; //aprox maximum distance a flight should take, in tiles.
 		minFlightDistance = 50; //aprox minimum distance a flight should take, in tiles.
 		minPopulationForAirport = 1000;
+		
 		airportLib = _SuperLib_Airport();
 		spiralWalker = _MinchinWeb_SW_();
 		helper = _SuperLib_Helper();
 		stationStats = StationStats();
+		townManager = TownManager();
+		
 		PAXID = helper.GetPAXCargo();
 		townToConnect = AIList();
 		aircraftBuilt = AIList();
@@ -288,34 +294,15 @@ function AirportManager::BuildNewAirportsAndAircraft(existingAirport = 0) {
 		AILog.Info("Building airport at " + AITown.GetName(town));
 		
 
-		if (AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_APPALLING || 
-				AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_VERY_POOR) {
-			local tile = null;
-			local iii = 0;
-			
-			AILog.Info("Planting trees at " + AITown.GetName(town) + " Rating: " + AITown.GetRating(town, COMPANYID));
-			
-			spiralWalker.Start(AITown.GetLocation(town));
-			do {
-				spiralWalker.Walk();
-				tile = spiralWalker.GetTile();
-				if (AITile.GetTownAuthority(tile) == town) {
-					AITile.PlantTree(tile);
-					AITile.PlantTree(tile);
-					AITile.PlantTree(tile);
-				}
-				iii++;
-			} while ((AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_APPALLING || 
-				AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_VERY_POOR) && iii < 700);
-		}
-		
-		while (AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_APPALLING || 
-				AITown.GetRating(town, COMPANYID) == AITown.TOWN_RATING_VERY_POOR) {
-			AILog.Info("Bribing " + AITown.GetName(town) + " Rating: " + AITown.GetRating(town, COMPANYID));
-			AITown.PerformTownAction(town, 7);
-		}
+		townManager.AppeaseLocalAuthority(town, AITown.TOWN_RATING_POOR);
 
 		airportTile = airportLib.BuildAirportInTown(town, airportToUse, PAXID, PAXID);
+		
+		while (AIError.GetLastError() == AIError.ERR_LOCAL_AUTHORITY_REFUSES && airportTile == null) {
+			townManager.AppeaseLocalAuthority(town, AITown.TOWN_RATING_POOR);
+			airportTile = airportLib.BuildAirportInTown(town, airportToUse, PAXID, PAXID);
+		}
+		
 		if (airportTile != null) {
 			local airportID = AIStation.GetStationID(airportTile);
 			stationStats.InitializeAirport(airportID, town);
