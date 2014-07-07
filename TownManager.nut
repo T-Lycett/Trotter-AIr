@@ -23,9 +23,8 @@ function TownManager::AppeaseLocalAuthority(town, requiredRating) {
 				spiralWalker.Walk();
 				tile = spiralWalker.GetTile();
 				if (AITile.GetTownAuthority(tile) == town) {
-					AITile.PlantTree(tile);
-					AITile.PlantTree(tile);
-					AITile.PlantTree(tile);
+					do {
+					} while(AITile.PlantTree(tile));
 				}
 				iii++;
 			} while (AITown.GetRating(town, COMPANYID) <= requiredRating && iii < 1000);
