@@ -4,6 +4,7 @@ class StationStats {
 	helper = null;
 	airportTown = null;
 	airportFullCapacityCount = null;
+	airportLastEmptyAirspaceDate = null;
 	townsWithoutAirports = null;
 	aircraftLastTransferAirport = null;
 	aircraftAirportBuiltAt = null;
@@ -12,6 +13,7 @@ class StationStats {
 		helper = _SuperLib_Helper();
 		airportTown = AIList();
 		airportFullCapacityCount = AIList();
+		airportLastEmptyAirspaceDate = AIList();
 		townsWithoutAirports = AITownList();
 		aircraftLastTransferAirport = AIList();
 		aircraftAirportBuiltAt = AIList();
@@ -26,6 +28,7 @@ function StationStats::InitializeAirport(airport, town) {
 	townsWithoutAirports.RemoveItem(town);
 	airportTown.AddItem(airport, town);
 	airportFullCapacityCount.AddItem(airport, 0);
+	airportLastEmptyAirspaceDate.AddItem(airport, 0);
 	
 	AILog.Warning("Initialize " + airport + " " + AIBaseStation.GetName(airport));
 	
@@ -68,6 +71,10 @@ function StationStats::UpdateAirportStats() {
 				
 				aircraftLastTransferAirport.SetValue(aircraft, airport);
 			}
+		}
+		
+		if (airportLib.GetNumAircraftsInAirportQueue(airport) == 0) {
+			airportLastEmptyAirspaceDate.SetValue(airport, AIDate.GetCurrentDate());
 		}
 	}
 	
@@ -142,6 +149,12 @@ function StationStats::GetAirportFullCapacityCount(airport) {
 	
 	return airportFullCapacityCount.GetValue(airport);
 
+}
+
+
+
+function StationStats::GetLastEmptyAirspaceDate(airport) {
+	return airportLastEmptyAirspaceDate.GetValue(airport);
 }
 
 

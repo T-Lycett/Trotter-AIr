@@ -4,6 +4,7 @@ class AirportManager {
 	maxFlightDistance = 0;
 	minFlightDistance = 0;
 	minPopulationForAirport = 0;
+	maxDaysSinceAirspaceLastEmpty = 0;
 	
 	airportLib = null;
 	helper = null;
@@ -26,6 +27,7 @@ class AirportManager {
 		maxFlightDistance = 200; //aprox maximum distance a flight should take, in tiles.
 		minFlightDistance = 50; //aprox minimum distance a flight should take, in tiles.
 		minPopulationForAirport = 1000;
+		maxDaysSinceAirspaceLastEmpty = 30;
 		
 		airportLib = _SuperLib_Airport();
 		spiralWalker = _MinchinWeb_SW_();
@@ -112,10 +114,12 @@ function AirportManager::GetAirportsToUpgradeService() {
 		local totalCapacity = stationStats.GetTotalAircraftCapacity(airport, PAXID);
 		local aircraftWithAirportAsOrder = AIVehicleList_Station(airport);
 		local numberOfAircraft = aircraftWithAirportAsOrder.Count();
+		local lastEmptyAirspaceDate = stationStats.GetLastEmptyAirspaceDate(airport);
 		
-		AILog.Info("Full capacity count is " + fullCapacityCount + " at " + AIBaseStation.GetName(airport));
+		AILog.Info("Full capacity count is " + fullCapacityCount + " at " + AIBaseStation.GetName(airport) + " " + lastEmptyAirspaceDate + " " + AIDate.GetCurrentDate());
 		
-		if (fullCapacityCount >= fullCapacityCountLimit || numberOfAircraft == 0 || totalCapacity < AIStation.GetCargoWaiting(airport, PAXID)) {
+		if ((fullCapacityCount >= fullCapacityCountLimit || numberOfAircraft == 0 || totalCapacity < AIStation.GetCargoWaiting(airport, PAXID))
+			 && (AIDate.GetCurrentDate() - maxDaysSinceAirspaceLastEmpty) < lastEmptyAirspaceDate) {
 			airportsToUpgradeService.AddItem(airport, 0);
 			//if (fullCapacityCount >= fullCapacityCountLimit) {
 				//AILog.Info("1");
