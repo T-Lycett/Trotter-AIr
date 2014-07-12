@@ -70,8 +70,13 @@ function AirportManager::PlanNewAirportsAndAircraft(maintainingExistingAirport, 
 			
 			foreach (town, score in townList) {
 				score = this.ScoreTown(town, false, townToConnect.Begin());
+				AILog.Info(AITown.GetName(town) + " " + score);
+				townList.SetValue(town, score);
 				if (score == 0) townList.RemoveItem(town);
-				//AILog.Info(AITown.GetName(town) + " " + score);
+			}
+			townList.Sort(AIList.SORT_BY_VALUE, false);
+			foreach (town, score in townList) {
+				AILog.Info(AITown.GetName(town) + " " + score);
 			}
 			townToConnect.AddItem(townList.Begin(), 0);
 			
@@ -85,11 +90,15 @@ function AirportManager::PlanNewAirportsAndAircraft(maintainingExistingAirport, 
 	} else {
 		if (!townList.IsEmpty()) {
 			local firstTown = stationStats.GetTownOfAirport(airport);
+			townList.RemoveItem(firstTown);
 			foreach (town, score in townList) {
 				score = this.ScoreTown(town, false, firstTown);
+				townList.SetValue(town, score);
 				if (score == 0) townList.RemoveItem(town);
 				//AILog.Info(AITown.GetName(town) + " " + score);
 			}
+		}
+		if (!townList.IsEmpty()) {
 			townList.Sort(AIList.SORT_BY_VALUE, false);
 			townToConnect.AddItem(townList.Begin(), 0);
 			numberOfAircraftToUse = 1;
@@ -420,6 +429,8 @@ function AirportManager::ScoreTown(townScoring = 0, maintainingExistingAirport =
 	local maxPopulation = 1;
 	local maxTownsInRange = 1;
 	
+	if (population < minPopulationForAirport) return 0;
+	
 	townList.Valuate(AITown.GetPopulation);
 	townList_2.Valuate(AITown.GetPopulation);
 	
@@ -514,7 +525,7 @@ function ScoreAircraft(aircraft, aircraftList) {
 
 
 function GetNumberOfAircraftToUse() {
-	local populationPerAircraft = 1000;
+	local populationPerAircraft = 1500;
 	local maxNumberOfAircraftToUse = 10;
 	local tempNumberOfAircraftToUse = ((AITown.GetPopulation(townToConnect.Begin()) + AITown.GetPopulation(townToConnect.Next())) / 2.00) / populationPerAircraft;
 	return min(floor(tempNumberOfAircraftToUse + 0.5 ).tointeger(), maxNumberOfAircraftToUse);

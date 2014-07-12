@@ -10,6 +10,8 @@ class TownManager {
 
 function TownManager::AppeaseLocalAuthority(town, requiredRating) {
 	
+	if (AITown.GetRating(town, COMPANYID) == 0) return false;
+	
 	AILog.Info("appeasing local authority");
 	
 	if (AITown.GetRating(town, COMPANYID) <= requiredRating) {
